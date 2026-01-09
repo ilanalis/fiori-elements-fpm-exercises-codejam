@@ -117,3 +117,51 @@ annotate service.Books with {
     }
 };
 
+annotate CatalogService.Sales with @(
+
+    UI.Chart                         : {
+        $Type              : 'UI.ChartDefinitionType',
+        ChartType          : #Line,
+        DynamicMeasures    : ['@Analytics.AggregatedProperty#sum'],
+        MeasureAttributes  : [{
+            $Type         : 'UI.ChartMeasureAttributeType',
+            DynamicMeasure: '@Analytics.AggregatedProperty#sum',
+            Role          : #Axis1
+        }],
+        Dimensions         : [date],
+        DimensionAttributes: [{
+            $Type    : 'UI.ChartDimensionAttributeType',
+            Dimension: date,
+            Role     : #Category
+        }]
+    },
+
+    Analytics.AggregatedProperty #sum: {
+        Name                : 'sumSales',
+        AggregationMethod   : 'sum',
+        AggregatableProperty: 'price',
+        ![@Common.Label]    : 'Sum Sales'
+    },
+
+    Aggregation.ApplySupported       : {
+        Transformations         : [
+            'aggregate',
+            'topcount',
+            'bottomcount',
+            'identity',
+            'concat',
+            'groupby',
+            'filter',
+            'top',
+            'skip',
+            'orderby',
+            'search'
+        ],
+        CustomAggregationMethods: ['Custom.concat'],
+        Rollup                  : #None,
+        PropertyRestrictions    : true,
+        GroupableProperties     : [date],
+        AggregatableProperties  : [{Property: price}]
+    }
+
+);
