@@ -1,149 +1,126 @@
 using CatalogService as service from '../../srv/cat-service';
-annotate service.Books with @(
-    UI.FieldGroup #GeneratedGroup : {
+
+//general
+annotate CatalogService.Books with {
+    title @title: 'Title';
+    descr @title: 'Description';
+    author @title: 'Author';
+    genre @title: 'Genre';
+    price @title: 'Price';
+    stock @title: 'Stock';
+}
+
+annotate CatalogService.Books with @(
+    UI: {
+        SelectionFields: [genre_ID, authorID],
+        HeaderInfo: {
+            TypeName: 'Book',
+            TypeNamePlural: 'Books',
+            Title: {Value: title},
+            Description: {Value: author.name}
+        },
+        Identification: [ { Value: ID } ],
+        LineItem: {
+            $value: [
+                {
+                    $Type: 'UI.DataField',
+                    Value: title,
+                    ![@UI.Importance] : #High
+                },
+                {
+                    $Type: 'UI.DataField',
+                    Value: author.name,
+                    Label: 'Author',
+                    ![@UI.Importance] : #High
+                },
+                {
+                    $Type: 'UI.DataField',
+                    Value: genre.name,
+                    Label: 'Genre',
+                    ![@UI.Importance] : #Medium
+                },
+                {
+                    $Type: 'UI.DataField',
+                    Value: price,
+                    ![@UI.Importance] : #Medium
+                },
+                {
+                    $Type: 'UI.DataField',
+                    Value: stock,
+                    Criticality : criticality,
+                    CriticalityRepresentation : #WithoutIcon,
+                    ![@UI.Importance] : #Medium
+                } 
+            ],
+            ![@UI.Criticality] : criticality // criticality for whole line item
+        }
+    },
+    UI.FieldGroup #GeneratedGroup1 : {
         $Type : 'UI.FieldGroupType',
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'title',
                 Value : title,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'descr',
                 Value : descr,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'author_ID',
-                Value : author_ID,
+                Value : author.name,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'genre_ID',
-                Value : genre_ID,
+                Value : genre.name,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'stock',
                 Value : stock,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'criticality',
-                Value : criticality,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'price',
                 Value : price,
             },
-            {
-                $Type : 'UI.DataField',
-                Label : 'currency_code',
-                Value : currency_code,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'image',
-                Value : image,
-            },
         ],
+        Label : 'General Information',
     },
     UI.Facets : [
         {
             $Type : 'UI.ReferenceFacet',
-            ID : 'GeneratedFacet1',
             Label : 'General Information',
-            Target : '@UI.FieldGroup#GeneratedGroup',
-        },
-    ],
-    UI.LineItem : [
-        {
-            $Type : 'UI.DataField',
-            Label : 'title',
-            Value : title,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'descr',
-            Value : descr,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'author_ID',
-            Value : author_ID,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'genre_ID',
-            Value : genre_ID,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'stock',
-            Value : stock,
+            ID : 'GeneratedFacet1',
+            Target : '@UI.FieldGroup#GeneratedGroup1',
         },
     ],
 );
 
-annotate service.Books with {
-    author @Common.ValueList : {
-        $Type : 'Common.ValueListType',
-        CollectionPath : 'Authors',
-        Parameters : [
-            {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : author_ID,
-                ValueListProperty : 'ID',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'name',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'dateOfBirth',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'dateOfDeath',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'placeOfBirth',
-            },
-        ],
-    }
-};
-
 annotate CatalogService.Sales with @(
-
-    UI.Chart                         : {
-        $Type              : 'UI.ChartDefinitionType',
-        ChartType          : #Line,
-        DynamicMeasures    : ['@Analytics.AggregatedProperty#sum'],
-        MeasureAttributes  : [{
-            $Type         : 'UI.ChartMeasureAttributeType',
+    UI.Chart: {
+        $Type: 'UI.ChartDefinitionType',
+        ChartType: #Line,
+        DynamicMeasures: ['@Analytics.AggregatedProperty#sum'],
+        MeasureAttributes: [{
+            $Type: 'UI.ChartMeasureAttributeType',
             DynamicMeasure: '@Analytics.AggregatedProperty#sum',
             Role          : #Axis1
         }],
-        Dimensions         : [date],
+        Dimensions: [date],
         DimensionAttributes: [{
-            $Type    : 'UI.ChartDimensionAttributeType',
+            $Type: 'UI.ChartDimensionAttributeType',
             Dimension: date,
-            Role     : #Category
+            Role: #Category
         }]
     },
 
-    Analytics.AggregatedProperty #sum: {
+      Analytics.AggregatedProperty #sum: {
         Name                : 'sumSales',
         AggregationMethod   : 'sum',
         AggregatableProperty: 'price',
         ![@Common.Label]    : 'Sum Sales'
     },
 
-    Aggregation.ApplySupported       : {
+     Aggregation.ApplySupported       : {
         Transformations         : [
             'aggregate',
             'topcount',
@@ -163,5 +140,4 @@ annotate CatalogService.Sales with @(
         GroupableProperties     : [date],
         AggregatableProperties  : [{Property: price}]
     }
-
 );
