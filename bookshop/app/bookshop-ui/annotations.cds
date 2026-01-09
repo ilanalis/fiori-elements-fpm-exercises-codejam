@@ -1,18 +1,18 @@
 using CatalogService as service from '../../srv/cat-service';
 
-//general
+// general
 annotate CatalogService.Books with {
-    title @title: 'Title';
-    descr @title: 'Description';
-    author @title: 'Author';
-    genre @title: 'Genre';
+    title @title : 'Title';
+    descr @title : 'Description';
+    author @title: 'Author' @Common: { Text: author.name, TextArrangement: #TextOnly };
+    genre @title: 'Genre' @Common: { Text: genre.name, TextArrangement: #TextOnly };
     price @title: 'Price';
     stock @title: 'Stock';
 }
 
 annotate CatalogService.Books with @(
     UI: {
-        SelectionFields: [genre_ID, authorID],
+        SelectionFields: [genre_ID, author_ID],
         HeaderInfo: {
             TypeName: 'Book',
             TypeNamePlural: 'Books',
@@ -68,11 +68,13 @@ annotate CatalogService.Books with @(
             },
             {
                 $Type : 'UI.DataField',
-                Value : author.name,
+                Label : 'Author',
+                Value : author_ID,
             },
-            {
+                    {
                 $Type : 'UI.DataField',
-                Value : genre.name,
+                Label : 'Genre',
+                Value : genre_ID,
             },
             {
                 $Type : 'UI.DataField',
@@ -141,3 +143,30 @@ annotate CatalogService.Sales with @(
         AggregatableProperties  : [{Property: price}]
     }
 );
+
+// value help for Authors
+annotate CatalogService.Books with {
+    author 
+    @Common.ValueListWithFixedValues : true // dropdown instead of dialog
+    @Common.ValueList : {
+        $Type : 'Common.ValueListType',
+        CollectionPath : 'Authors',
+        Parameters : [
+            {
+                $Type : 'Common.ValueListParameterInOut',
+                LocalDataProperty : author_ID,
+                ValueListProperty : 'ID',
+            }
+        ]
+    }
+};
+
+// value help for Authors: display name instead of ID
+annotate CatalogService.Authors with {
+    ID @Common.Text : {
+        $value : name,
+        ![@UI.TextArrangement] : #TextOnly,
+    }
+};
+
+annotate CatalogService.Books with @odata.draft.enabled;
