@@ -95,6 +95,32 @@ annotate CatalogService.Books with @(
             Target : '@UI.FieldGroup#GeneratedGroup1',
         },
     ],
+    UI.DataPoint #stock : {
+        Value : stock,
+        TargetValue : 100,
+        Criticality: criticality
+    },
+    UI.Chart #stock : {
+        ChartType : #Donut,
+        Title : 'Stock',
+        Measures : [
+            stock,
+        ],
+        MeasureAttributes : [
+            {
+                DataPoint : '@UI.DataPoint#stock',
+                Role : #Axis1,
+                Measure : stock,
+            },
+        ],
+    },
+    UI.HeaderFacets : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            ID : 'stock',
+            Target : '@UI.Chart#stock',
+        },
+    ],
 );
 
 annotate CatalogService.Sales with @(
